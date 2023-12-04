@@ -35,22 +35,22 @@ def fill_list(num_of_elements):
     return a
 
 
-def quadratic_model(x, a, b, c):
-    return a * x**2 + b * x + c
+def logarithmic_model(x, a, b):
+    return a * np.log(x) + b
 
 
 def lsm(name, time, graph_num):
     x_data = np.array(graph_stuff)
     y_data = np.array(list(time.values()))
 
-    params, trash = curve_fit(quadratic_model, x_data, y_data)
+    params, _ = curve_fit(logarithmic_model, x_data, y_data)
 
-    a_fit, b_fit, c_fit = params
+    a_fit, b_fit = params
     print(
-        f"Коэффициенты уравнения ({name}): a = {a_fit}, b = {b_fit}, c = {c_fit}")
+        f"Коэффициенты уравнения ({name}): a = {a_fit}, b = {b_fit}")
 
     x_fit = np.linspace(min(x_data), max(x_data), 100)
-    y_fit = quadratic_model(x_fit, *params)
+    y_fit = logarithmic_model(x_fit, *params)
 
     plt.figure(graph_num).set_figwidth(8)
     plt.title(

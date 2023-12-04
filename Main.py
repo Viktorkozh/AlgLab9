@@ -30,6 +30,13 @@ def bin_search(search_list, value):
     return right
 
 
+def search(search_list, value):
+    for item, index in enumerate(search_list):
+        if item == value:
+            return index
+    return -1
+
+
 def fill_list(num_of_elements):
     a = [random.randint(0, 1000) for _ in range(num_of_elements)]
     return a
@@ -78,5 +85,21 @@ if __name__ == '__main__':
             lambda: bin_search(a, a[t]), number=100) / 100
 
     lsm("Средний случай", median_time, 2)
+
+
+    for i in range(10, aod, 10):
+        a = fill_list(i)
+        worst_time[i] = (timeit.timeit(
+            lambda: search(a, 10000000), number=100)) / 100
+
+    lsm("Худший случай", worst_time, 3)
+
+    for i in range(10, aod, 10):
+        a = fill_list(i)
+        t = int(random.randint(1, i - 1))
+        median_time[i] = timeit.timeit(
+            lambda: search(a, a[t]), number=100) / 100
+
+    lsm("Средний случай", median_time, 4)
 
     plt.show()

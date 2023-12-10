@@ -30,7 +30,7 @@ def bin_search(search_list, value):
 
 
 def search(search_list, value):
-    for item, index in enumerate(search_list):
+    for index, item in enumerate(search_list):
         if item == value:
             return index
     return -1
@@ -75,7 +75,7 @@ def lsm(name, time, graph_num, log):
              ), np.array(list(time.values()))
         )
         plt.plot(graph_stuff, alpha[0] *
-                 np.array(list(graph_stuff)) + alpha[1], "r")
+                np.array(list(graph_stuff)) + alpha[1], "r")
 
         formatted_alpha = [format(a, ".10f") for a in alpha]
         print(

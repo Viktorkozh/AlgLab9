@@ -6,13 +6,14 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.optimize import curve_fit
+import bisect
 
 
 amount_of_dots = 1000  # Количество точек
 aod = (amount_of_dots + 1) * 10
 worst_time = {}
 median_time = {}
-graph_stuff = [i for i in range(10, 10010, 10)]
+graph_stuff = [i for i in range(10, aod, 10)]
 xlabel = "Количество элементов в массиве"
 ylabel = "Среднее время выполнения (секунды)"
 
@@ -37,7 +38,7 @@ def search(search_list, value):
 
 
 def fill_list(num_of_elements):
-    a = [random.randint(0, 1000) for _ in range(num_of_elements)]
+    a = [random.randint(0, 100000) for _ in range(num_of_elements)]
     return a
 
 
@@ -63,6 +64,8 @@ def lsm(name, time, graph_num, log):
         a_fit, b_fit = params
         print(
             f"Коэффициенты уравнения ({name}): a = {a_fit}, b = {b_fit}")
+        # print(f"Корреляция {name}:", np.corrcoef(
+        #     graph_stuff, list(time.values()))[0, 1]) Не знаю, надо ли корреляцию, так что оставлю тут.
 
         x_fit = np.linspace(min(x_data), max(x_data), 100)
         y_fit = logarithmic_model(x_fit, *params)
@@ -84,41 +87,32 @@ def lsm(name, time, graph_num, log):
             "b =",
             formatted_alpha[1],
         )
-        print(f"Корреляция {name}:", np.corrcoef(
-            graph_stuff, list(time.values()))[0, 1])
+        # print(f"Корреляция {name}:", np.corrcoef(
+        #     graph_stuff, list(time.values()))[0, 1])
 
     plt.scatter(graph_stuff, time.values(), s=5, c="orange")
 
 
+def results(name, func, graph_index, log):
+    for i in range(10, aod, 10):
+        a = fill_list(i)
+        worst_time[i] = (timeit.timeit(
+            lambda: func(a, 10000000), number=100)) / 100
+
+    lsm("Худший случай, " + name, worst_time, graph_index, log)
+
+    for i in range(10, aod, 10):
+        a = fill_list(i)
+        t = int(random.randint(1, i - 1))
+        median_time[i] = timeit.timeit(
+            lambda: func(a, a[t]), number=100) / 100
+
+    lsm("Средний случай, " + name, median_time, graph_index + 1, log)
+
+
 if __name__ == '__main__':
-    for i in range(10, aod, 10):
-        a = fill_list(i)
-        worst_time[i] = (timeit.timeit(
-            lambda: bin_search(a, 10000000), number=100)) / 100
-
-    lsm("Худший случай", worst_time, 1, True)
-
-    for i in range(10, aod, 10):
-        a = fill_list(i)
-        t = int(random.randint(1, i - 1))
-        median_time[i] = timeit.timeit(
-            lambda: bin_search(a, a[t]), number=100) / 100
-
-    lsm("Средний случай", median_time, 2, True)
-
-    for i in range(10, aod, 10):
-        a = fill_list(i)
-        worst_time[i] = (timeit.timeit(
-            lambda: search(a, 10000000), number=100)) / 100
-
-    lsm("Худший случай", worst_time, 3, False)
-
-    for i in range(10, aod, 10):
-        a = fill_list(i)
-        t = int(random.randint(1, i - 1))
-        median_time[i] = timeit.timeit(
-            lambda: search(a, a[t]), number=100) / 100
-
-    lsm("Средний случай", median_time, 4, False)
+    results("бинарный поиск", bin_search, 0, True)
+    results("линейный поиск", search, 2, False)
+    results("встроенный в python бинарный поиск", bin_search, 4, True)
 
     plt.show()

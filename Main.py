@@ -9,7 +9,7 @@ from scipy.optimize import curve_fit
 import bisect
 
 
-amount_of_dots = 1000  # Количество точек
+amount_of_dots = 100  # Количество точек
 aod = (amount_of_dots + 1) * 10
 worst_time = {}
 median_time = {}
@@ -54,7 +54,7 @@ def lsm(name, time, graph_num, log):
     plt.ylabel(ylabel)
     plt.tight_layout()
     plt.grid(False)
-    
+
     x_data = np.array(graph_stuff)
     y_data = np.array(list(time.values()))
 
@@ -62,8 +62,7 @@ def lsm(name, time, graph_num, log):
         params, _ = curve_fit(logarithmic_model, x_data, y_data)
 
         a_fit, b_fit = params
-        print(
-            f"Коэффициенты уравнения ({name}): a = {a_fit}, b = {b_fit}")
+        print(f"Коэффициенты уравнения ({name}): a = {a_fit}, b = {b_fit}")
         # print(f"Корреляция {name}:", np.corrcoef(
         #     graph_stuff, list(time.values()))[0, 1]) Не знаю, надо ли корреляцию, так что оставлю тут.
 
@@ -98,21 +97,17 @@ def results(name, func, graph_index, log):
         a = fill_list(i)
         worst_time[i] = (timeit.timeit(
             lambda: func(a, 10000000), number=100)) / 100
+        t = int(random.randint(1, i - 1))
+        median_time[i] = timeit.timeit(lambda: func(a, a[t]),
+                                       number=100) / 100
 
     lsm("Худший случай, " + name, worst_time, graph_index, log)
-
-    for i in range(10, aod, 10):
-        a = fill_list(i)
-        t = int(random.randint(1, i - 1))
-        median_time[i] = timeit.timeit(
-            lambda: func(a, a[t]), number=100) / 100
-
     lsm("Средний случай, " + name, median_time, graph_index + 1, log)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     results("бинарный поиск", bin_search, 0, True)
     results("линейный поиск", search, 2, False)
-    results("встроенный в python бинарный поиск", bin_search, 4, True)
+    results("встроенный в python бинарный поиск", bisect.bisect_left, 4, True)
 
     plt.show()

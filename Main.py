@@ -53,11 +53,11 @@ def lsm(name, time, graph_num, log):
     plt.ylabel(ylabel)
     plt.tight_layout()
     plt.grid(False)
+    
+    x_data = np.array(graph_stuff)
+    y_data = np.array(list(time.values()))
 
-    if log == 1:
-        x_data = np.array(graph_stuff)
-        y_data = np.array(list(time.values()))
-
+    if log:
         params, _ = curve_fit(logarithmic_model, x_data, y_data)
 
         a_fit, b_fit = params
@@ -75,7 +75,7 @@ def lsm(name, time, graph_num, log):
              ), np.array(list(time.values()))
         )
         plt.plot(graph_stuff, alpha[0] *
-                np.array(list(graph_stuff)) + alpha[1], "r")
+                 np.array(list(graph_stuff)) + alpha[1], "r")
 
         formatted_alpha = [format(a, ".10f") for a in alpha]
         print(
